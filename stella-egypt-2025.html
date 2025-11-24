@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stella Final - Egypt Real Estate 2025-2030</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Cairo', sans-serif; background: linear-gradient(135deg,#0f0c29,#302b63,#24243e); min-height: 100vh; direction: rtl; color: #fff; overflow-x: hidden; }
+
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; position: relative; }
+.header { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.2); text-align: center; position: relative; }
+.header h1 { font-size: 28px; color: #00FFFF; text-shadow: 0 0 10px rgba(0,255,255,0.5); }
+.header .indicators { display: flex; justify-content: center; gap: 40px; margin-top: 15px; }
+.header .indicator { text-align: center; }
+.header .indicator .label { display: block; font-size: 12px; color: #B0B0B0; margin-bottom: 5px; }
+.header .indicator .value { font-size: 20px; font-weight: 700; color: #00FF00; text-shadow: 0 0 8px rgba(0,255,0,0.5); }
+
+/* مؤشر الشهر */
+.month-indicator {
+position: absolute;
+top: 20px;
+left: 20px;
+background: rgba(0,255,255,0.2);
+padding: 8px 15px;
+border-radius: 20px;
+border: 1px solid #00FFFF;
+font-size: 14px;
+font-weight: 700;
+display: none;
+}
+.month-indicator.active { display: block; }
+
+/* المؤشرات النهائية - تم نقلها للأعلى */
+.final-indicators-section {
+background: rgba(255,255,255,0.05); 
+border-radius: 15px; 
+padding: 20px; 
+margin-bottom: 20px;
+border: 1px solid rgba(0,255,255,0.3);
+}
+.results-title { font-size: 18px; color: #00FFFF; text-align: center; margin-bottom: 20px; font-weight: 700; }
+.results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+.result-card { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; }
+.result-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+.result-card h4 { font-size: 11px; color: #B0B0B0; margin-bottom: 8px; font-weight: 600; }
+.result-card .value { font-size: 26px; font-weight: 700; margin: 10px 0; transition: all 0.5s ease; }
+.result-card .change { font-size: 10px; margin-top: 5px; font-weight: 600; }
+.result-card.positive .value { color: #00FF00; text-shadow: 0 0 10px rgba(0,255,0,0.3); }
+.result-card.negative .value { color: #FF0000; text-shadow: 0 0 10px rgba(255,0,0,0.3); }
+.result-card.neutral .value { color: #FFA500; text-shadow: 0 0 10px rgba(255,165,0,0.3); }
+
+/* تأثير الإضاءة عند التغيير */
+.glow { animation: glow 0.8s ease-in-out; }
+@keyframes glow {
+0%, 100% { box-shadow: 0 0 5px currentColor; }
+50% { box-shadow: 0 0 25px currentColor, 0 0 35px currentColor; }
+}
+
+.control-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+.independent-panel { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 20px; border: 1px solid rgba(0,255,0,0.3); box-shadow: 0 0 20px rgba(0,255,0,0.2); }
+.dependent-panel { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 20px; border: 1px solid rgba(255,165,0,0.3); box-shadow: 0 0 20px rgba(255,165,0,0.2); }
+.panel-title { font-size: 18px; margin-bottom: 20px; text-align: center; font-weight: 700; }
+.independent-panel .panel-title { color: #00FF00; }
+.dependent-panel .panel-title { color: #FFA500; }
+
+.control-item { margin-bottom: 25px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; transition: all 0.3s ease; }
+.control-item:hover { background: rgba(0,0,0,0.3); transform: translateY(-2px); }
+.control-label { display: block; font-size: 13px; color: #E0E0E0; margin-bottom: 10px; font-weight: 600; }
+
+/* حاوية السلايدر */
+.slider-container { position: relative; margin: 25px 0; padding: 0 5px; }
+.control-slider { width: 100%; height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; outline: none; cursor: pointer; transition: background 0.3s ease; }
+.control-slider:hover { background: rgba(255,255,255,0.3); }
+.control-slider::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; background: #00FFFF; border-radius: 50%; cursor: pointer; box-shadow: 0 0 10px rgba(0,255,255,0.5); transition: transform 0.2s ease; }
+.control-slider::-moz-range-thumb { width: 20px; height: 20px; background: #00FFFF; border-radius: 50%; cursor: pointer; border: none; box-shadow: 0 0 10px rgba(0,255,255,0.5); }
+
+/* قيمة السلايدر الدائمة */
+.slider-value-display {
+position: absolute;
+top: -40px;
+left: 50%;
+transform: translateX(-50%);
+background: #00FFFF;
+color: #000;
+padding: 6px 12px;
+border-radius: 5px;
+font-size: 13px;
+font-weight: 700;
+pointer-events: none;
+box-shadow: 0 2px 10px rgba(0,255,255,0.5);
+z-index: 10;
+white-space: nowrap;
+opacity: 1;
+}
+.slider-value-display::after {
+content: '';
+position: absolute;
+top: 100%;
+left: 50%;
+transform: translateX(-50%);
+border: 6px solid transparent;
+border-top-color: #00FFFF;
+}
+
+/* الوعاء */
+.vessel-display { position: relative; height: 150px; margin: 20px 0; }
+.vessel-circle-container { 
+width: 130px; 
+height: 130px; 
+position: absolute; 
+left: 50%; 
+top: 50%; 
+transform: translate(-50%, -50%);
+overflow: hidden;
+border-radius: 50%;
+border: 3px solid;
+box-shadow: 0 0 20px currentColor;
+background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent);
+}
+.vessel-circle { width: 100%; height: 100%; border-radius: 50%; }
+.vessel-fill { position: absolute; bottom: 0; left: 0; right: 0; height: 0%; transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+.vessel-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 22px; font-weight: 700; color: #fff; text-shadow: 0 0 10px rgba(0,0,0,0.8); z-index: 10; }
+.vessel-name { text-align: center; font-size: 12px; color: #B0B0B0; margin-top: 10px; font-weight: 600; }
+
+/* أزرار التحكم */
+.control-buttons { 
+display: flex; 
+justify-content: center; 
+gap: 15px; 
+margin-top: 30px; 
+padding: 20px; 
+background: rgba(0,0,0,0.3); 
+border-radius: 15px; 
+border: 1px solid rgba(255,255,255,0.1); 
+flex-wrap: wrap;
+}
+.control-btn { 
+padding: 12px 25px; 
+border: none; 
+border-radius: 8px; 
+font-size: 14px; 
+font-weight: 700; 
+cursor: pointer; 
+transition: all 0.3s ease; 
+box-shadow: 0 3px 15px rgba(0,0,0,0.3); 
+white-space: nowrap;
+min-width: 120px;
+}
+.control-btn:hover { transform: translateY(-2px) scale(1.05); }
+.control-btn:active { transform: translateY(0) scale(1); }
+
+#run-btn { background: linear-gradient(135deg,#00FF00,#00AA00); color: #fff; }
+#stop-btn { background: linear-gradient(135deg,#FF0000,#AA0000); color: #fff; }
+#reset-btn { background: linear-gradient(135deg,#FFA500,#FF7700); color: #fff; }
+#manual-btn { background: linear-gradient(135deg,#0080FF,#0060CC); color: #fff; }
+#save-btn { background: linear-gradient(135deg,#FFD700,#FFA500); color: #000; }
+
+.running { animation: pulse 1.5s infinite; }
+@keyframes pulse {
+0% { box-shadow: 0 5px 20px rgba(0,255,0,0.4); }
+50% { box-shadow: 0 8px 30px rgba(0,255,0,0.8); }
+100% { box-shadow: 0 5px 20px rgba(0,255,0,0.4); }
+}
+
+/* منع التداخلات */
+@media (max-width: 1200px) {
+.control-grid { grid-template-columns: 1fr; }
+.results-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+}
+</style>
+</head>
+<body>
+<div class="container">
+<header class="header">
+<div class="month-indicator" id="month-indicator">
+الشهر: <span id="month-counter">2025-1</span>
+</div>
+<h1>🎛️ لوحة التحكم اليدوية - السوق العقاري 2025-2030</h1>
+<div class="indicators">
+<div class="indicator"><span class="label">حجم السوق</span><span id="market-size" class="value">$25.8B</span></div>
+<div class="indicator"><span class="label">سنة المحاكاة</span><span id="current-year" class="value">2025-2030</span></div>
+<div class="indicator"><span class="label">الوضع</span><span id="mode-status" class="value">يدوي</span></div>
+</div>
+</header>
+
+<!-- المؤشرات النهائية - تم نقلها للأعلى -->
+<div class="final-indicators-section">
+<h3 class="results-title">📊 المؤشرات النهائية (تتحدث فوراً)</h3>
+<div class="results-grid">
+<div class="result-card neutral" id="card-gap">
+<h4>⚖️ فجوة العرض/الطلب</h4>
+<div class="value" id="result-gap">0.4%</div>
+<div class="change" id="result-gap-change">متوازن</div>
+</div>
+
+<div class="result-card neutral" id="card-market">
+<h4>📊 مؤشر السوق</h4>
+<div class="value" id="result-market">53.8%</div>
+<div class="change" id="result-market-change">مستقر</div>
+</div>
+
+<div class="result-card positive" id="card-supply">
+<h4>🏗️ نمو العرض</h4>
+<div class="value" id="result-supply-growth">+2.1%</div>
+<div class="change">سنوياً</div>
+</div>
+
+<div class="result-card negative" id="card-cost">
+<h4>⚠️ ضغط التكاليف</h4>
+<div class="value" id="result-cost-pressure">38.5%</div>
+<div class="change" id="result-cost-change">مُرتفع</div>
+</div>
+
+<div class="result-card positive" id="card-confidence">
+<h4>💪 ثقة السوق</h4>
+<div class="value" id="result-confidence-level">58.9%</div>
+<div class="change" id="result-confidence-change">جيدة</div>
+</div>
+
+<div class="result-card neutral" id="card-forecast">
+<h4>🔮 توقع التالي</h4>
+<div class="value" id="result-forecast">61.2%</div>
+<div class="change" id="result-forecast-change">↑ نمو</div>
+</div>
+</div>
+</div>
+
+<div class="control-grid">
+<!-- المتغيرات المستقلة -->
+<div class="independent-panel">
+<h3 class="panel-title">🎮 متغيرات مستقلة (اضبطها)</h3>
+
+<div class="control-item">
+<label class="control-label">الطلب السكاني (المحرك الأساسي)</label>
+<div class="vessel-display">
+<div class="vessel-circle-container" style="border-color: #00FF00; color: #00FF00;">
+<div class="vessel-circle"></div>
+<div class="vessel-fill" id="fill-demand" style="height: 48.2%; background: linear-gradient(to top, #00FF00, #00FFFF);"></div>
+<div class="vessel-text" id="text-demand">48.2%</div>
+</div>
+<div class="vessel-name">الطلب السكاني</div>
+</div>
+<div class="slider-container">
+<input type="range" class="control-slider" id="slider-demand" min="0" max="100" value="48.2" step="0.1">
+<div class="slider-value-display" id="value-demand">48.2%</div>
+</div>
+</div>
+
+<div class="control-item">
+<label class="control-label">تكاليف التشييد (أقوى تأثير)</label>
+<div class="vessel-display">
+<div class="vessel-circle-container" style="border-color: #FF0000; color: #FF0000;">
+<div class="vessel-circle"></div>
+<div class="vessel-fill" id="fill-construction" style="height: 38.5%; background: linear-gradient(to top, #FF0000, #FF6600);"></div>
+<div class="vessel-text" id="text-construction">38.5%</div>
+</div>
+<div class="vessel-name">تكاليف التشييد</div>
+</div>
+<div class="slider-container">
+<input type="range" class="control-slider" id="slider-construction" min="0" max="100" value="38.5" step="0.1">
+<div class="slider-value-display" id="value-construction">38.5%</div>
+</div>
+</div>
+
+<div class="control-item">
+<label class="control-label">السياسات الحكومية (الصدمات)</label>
+<div class="vessel-display">
+<div class="vessel-circle-container" style="border-color: #0080FF; color: #0080FF;">
+<div class="vessel-circle"></div>
+<div class="vessel-fill" id="fill-policy" style="height: 0%; background: linear-gradient(to top, #0080FF, #00FFFF);"></div>
+<div class="vessel-text" id="text-policy">0.0%</div>
+</div>
+<div class="vessel-name">السياسات الحكومية</div>
+</div>
+<div class="slider-container">
+<input type="range" class="control-slider" id="slider-policy" min="-30" max="30" value="0" step="0.1">
+<div class="slider-value-display" id="value-policy">0.0%</div>
+</div>
+</div>
+
+<div class="control-item">
+<label class="control-label">الاستثمار الخليجي (الدافع)</label>
+<div class="vessel-display">
+<div class="vessel-circle-container" style="border-color: #FFA500; color: #FFA500;">
+<div class="vessel-circle"></div>
+<div class="vessel-fill" id="fill-foreign" style="height: 24.3%; background: linear-gradient(to top, #FFA500, #FFFF00);"></div>
+<div class="vessel-text" id="text-foreign">24.3%</div>
+</div>
+<div class="vessel-name">الاستثمار الخليجي</div>
+</div>
+<div class="slider-container">
+<input type="range" class="control-slider" id="slider-foreign" min="0" max="100" value="24.3" step="0.1">
+<div class="slider-value-display" id="value-foreign">24.3%</div>
+</div>
+</div>
+
+<div class="control-item">
+<label class="control-label">وحدات التصالح (المعروض الجديد)</label>
+<div class="vessel-display">
+<div class="vessel-circle-container" style="border-color: #FFD700; color: #FFD700;">
+<div class="vessel-circle"></div>
+<div class="vessel-fill" id="fill-reconciliation" style="height: 15%; background: linear-gradient(to top, #FFD700, #FFA500);"></div>
+<div class="vessel-text" id="text-reconciliation">15.0%</div>
+</div>
+<div class="vessel-name">وحدات التصالح</div>
+</div>
+<div class="slider-container">
+<input type="range" class="control-slider" id="slider-reconciliation" min="0" max="50" value="15" step="0.1">
+<div class="slider-value-display" id="value-reconciliation">15.0%</div>
+</div>
+</div>
+
+<div class="control-item">
+<label class="control-label">شفافية BLP (المنظم)</label>
+<div class="vessel-display">
+<div class="vessel-circle-container" style="border-color: #00FFFF; color: #00FFFF;">
+<div class="vessel-circle"></div>
+<div class="vessel-fill" id="fill-blp" style="height: 80%; background: linear-gradient(to top, #00FFFF, #0080FF);"></div>
+<div class="vessel-text" id="text-blp">80%</div>
+</div>
+<div class="vessel-name">شفافية BLP</div>
+</div>
+<div class="slider-container">
+<input type="range" class="control-slider" id="slider-blp" min="0" max="100" value="80" step="0.1">
+<div class="slider-value-display" id="value-blp">80%</div>
+</div>
+</div>
+</div>
+
+<!-- المتغيرات التابعة -->
+<div class="dependent-panel">
+<h3 class="panel-title">📈 متغيرات تابعة (تُحسب فوراً)</h3>
+
+<div class="control-item">
+<label class="control-label">القوة الشرائية</label>
+<div class="vessel-display">
+<div class="vessel-circle-container" style="border-color: #00CC00; color: #00CC00;">
+<div class="vessel-circle"></div>
+<div class="vessel-fill" id="fill-purchasing" style="height: 43.1%; background: linear-gradient(to top, #00CC00, #00FF00);"></div>
+<div class="vessel-text" id="text-purchasing">43.1%</div>
+</div>
+<div class="vessel-name">القوة الشرائية</div>
+</div>
+<small style="color:#888;display:block;margin-top:5px;">= الطلب السكاني × 0.88</small>
+</div>
+
+<div class="control-item">
+<label class="control-label">العرض من الوحدات</label>
+<div class="vessel-display">
+<div class="vessel-circle-container" style="border-color: #9B59B6; color: #9B59B6;">
+<div class="vessel-circle"></div>
+<div class="vessel-fill" id="fill-supply" style="height: 42.7%; background: linear-gradient(to top, #9B59B6, #E67E22);"></div>
+<div class="vessel-text" id="text-supply">42.7%</div>
+</div>
+<div class="vessel-name">العرض من الوحدات</div>
+</div>
+<small style="color:#888;display:block;margin-top:5px;">= استثمار + تصالح</small>
+</div>
+
+<div class="control-item">
+<label class="control-label">أسعار العقارات (المتغير الرئيسي)</label>
+<div class="vessel-display">
+<div class="vessel-circle-container" style="border-color: #FFD700; color: #FFD700;">
+<div class="vessel-circle"></div>
+<div class="vessel-fill" id="fill-prices" style="height: 53.8%; background: linear-gradient(to top, #FFD700, #FFA500);"></div>
+<div class="vessel-text" id="text-prices">53.8%</div>
+</div>
+<div class="vessel-name">أسعار العقارات</div>
+</div>
+<small style="color:#888;display:block;margin-top:5px;">= شرائية + تشييد + BLP</small>
+</div>
+
+<div class="control-item">
+<label class="control-label">ثقة المستهلكين</label>
+<div class="vessel-display">
+<div class="vessel-circle-container" style="border-color: #1ABC9C; color: #1ABC9C;">
+<div class="vessel-circle"></div>
+<div class="vessel-fill" id="fill-confidence" style="height: 58.9%; background: linear-gradient(to top, #1ABC9C, #00FFFF);"></div>
+<div class="vessel-text" id="text-confidence">58.9%</div>
+</div>
+<div class="vessel-name">ثقة المستهلكين</div>
+</div>
+<small style="color:#888;display:block;margin-top:5px;">= أسعار + سياسات</small>
+</div>
+</div>
+</div>
+
+<!-- أزرار التحكم -->
+<div class="control-buttons">
+<button class="control-btn" id="manual-btn">⚙️ ضبط يدوي</button>
+<button class="control-btn" id="run-btn">▶️ تشغيل النموذج</button>
+<button class="control-btn" id="stop-btn">⏸️ إيقاف</button>
+<button class="control-btn" id="reset-btn">🔄 إعادة تعيين</button>
+<button class="control-btn" id="save-btn">💾 حفظ التغييرات</button>
+</div>
+
+<script>
+class StellaFinalModel {
+constructor() {
+this.isRunning = false;
+this.runInterval = null;
+this.currentMonth = 0;
+this.startYear = 2025;
+this.endYear = 2030;
+this.originalStocks = {
+'الطلب السكاني': 48.2, 'تكاليف التشييد': 38.5, 'السياسات الحكومية': 0.0,
+'الاستثمار الخليجي': 24.3, 'وحدات التصالح': 15.0, 'شفافية BLP': 80
+};
+
+// تعيين المتغيرات التابعة للمعرفات
+this.dependentKeysMap = {
+'القوة الشرائية': 'purchasing',
+'العرض من الوحدات': 'supply',
+'أسعار العقارات': 'prices',
+'ثقة المستهلكين': 'confidence'
+};
+
+// تحميل الإعدادات المحفوظة
+const savedSettings = localStorage.getItem('stellaModelSettings');
+if (savedSettings) {
+try {
+const settings = JSON.parse(savedSettings);
+this.originalStocks = {...this.originalStocks, ...settings.stocks};
+console.log('✅ تم تحميل الإعدادات المحفوظة');
+} catch (e) {
+console.warn('Failed to load saved settings', e);
+}
+}
+
+this.stocks = {...this.originalStocks};
+this.dependent = {
+'القوة الشرائية': 43.1, 'العرض من الوحدات': 42.7,
+'أسعار العقارات': 53.8, 'ثقة المستهلكين': 58.9
+};
+
+this.previousValues = {...this.dependent};
+this.initEventListeners();
+this.updateDisplay(true);
+this.updateAllVessels();
+this.updateAllSliderValues();
+}
+
+initEventListeners() {
+// سلايدرات متواصلة التحديث مع عرض دائم
+Object.keys(this.stocks).forEach(key => {
+const idSuffix = this.getSliderIdSuffix(key);
+const slider = document.getElementById(`slider-${idSuffix}`);
+const valueDisplay = document.getElementById(`value-${idSuffix}`);
+
+if (slider) {
+slider.value = this.stocks[key];
+slider.addEventListener('input', (e) => {
+this.stocks[key] = parseFloat(e.target.value);
+this.updateSliderValueDisplay(slider, valueDisplay);
+this.applyChanges();
+this.animateVessel(key);
+});
+}
+});
+
+// أزرار التحكم
+document.getElementById('manual-btn').addEventListener('click', () => this.applyChanges());
+document.getElementById('run-btn').addEventListener('click', () => this.runModel());
+document.getElementById('stop-btn').addEventListener('click', () => this.stopModel());
+document.getElementById('reset-btn').addEventListener('click', () => this.resetModel());
+document.getElementById('save-btn').addEventListener('click', () => this.saveSettings());
+}
+
+getSliderIdSuffix(key) {
+if (key === 'وحدات التصالح') return 'reconciliation';
+if (key === 'شفافية BLP') return 'blp';
+return key.split(' ')[0].toLowerCase();
+}
+
+updateSliderValueDisplay(slider, displayElement) {
+const value = parseFloat(slider.value);
+const min = parseFloat(slider.min);
+const max = parseFloat(slider.max);
+const percentage = ((value - min) / (max - min)) * 100;
+if (displayElement) {
+displayElement.style.left = percentage + '%';
+displayElement.textContent = value.toFixed(1) + '%';
+}
+}
+
+updateAllSliderValues() {
+Object.keys(this.stocks).forEach(key => {
+const idSuffix = this.getSliderIdSuffix(key);
+const slider = document.getElementById(`slider-${idSuffix}`);
+const valueDisplay = document.getElementById(`value-${idSuffix}`);
+if (slider && valueDisplay) {
+this.updateSliderValueDisplay(slider, valueDisplay);
+}
+});
+}
+
+runModel() {
+if (this.isRunning) return;
+this.isRunning = true;
+this.currentMonth = 0;
+document.getElementById('run-btn').classList.add('running');
+document.getElementById('mode-status').textContent = 'تشغيل';
+document.getElementById('mode-status').style.color = '#00FF00';
+document.getElementById('month-indicator').classList.add('active');
+
+this.runInterval = setInterval(() => {
+this.currentMonth++;
+const currentYear = this.startYear + Math.floor(this.currentMonth / 12);
+const currentMonthInYear = (this.currentMonth % 12) + 1;
+document.getElementById('month-counter').textContent = `${currentYear}-${currentMonthInYear}`;
+
+// تحديث جميع المتغيرات المستقلة
+Object.keys(this.stocks).forEach(key => {
+const baseVariation = (Math.random() - 0.5) * 2.5;
+const trendFactor = this.currentMonth * 0.02;
+const variation = baseVariation * (1 + trendFactor);
+this.stocks[key] = Math.max(0, Math.min(100, this.stocks[key] + variation));
+    
+// تحديث السلايدر والوعي
+const idSuffix = this.getSliderIdSuffix(key);
+const slider = document.getElementById(`slider-${idSuffix}`);
+if (slider) {
+slider.value = this.stocks[key];
+this.updateSliderValueDisplay(slider, document.getElementById(`value-${idSuffix}`));
+}
+});
+
+// تطبيق التغييرات وتحديث كل شيء
+this.applyChanges();
+this.updateAllVessels();
+this.updateDependentVessels();
+
+// التحقق من نهاية المحاكاة (72 شهر)
+if (this.currentMonth >= 72) {
+this.stopModel();
+setTimeout(() => {
+alert('🏁 تم الانتهاء من محاكاة الفترة 2025-2030 (72 شهر)');
+}, 100);
+}
+}, 1000);
+}
+
+stopModel() {
+if (!this.isRunning) return;
+this.isRunning = false;
+document.getElementById('run-btn').classList.remove('running');
+document.getElementById('mode-status').textContent = 'متوقف';
+document.getElementById('mode-status').style.color = '#FF0000';
+document.getElementById('month-indicator').classList.remove('active');
+clearInterval(this.runInterval);
+}
+
+resetModel() {
+this.stopModel();
+this.stocks = {...this.originalStocks};
+this.dependent = {
+'القوة الشرائية': 43.1, 'العرض من الوحدات': 42.7,
+'أسعار العقارات': 53.8, 'ثقة المستهلكين': 58.9
+};
+this.currentMonth = 0;
+this.updateDisplay(true);
+this.updateAllVessels();
+this.updateAllSliderValues();
+this.updateDependentVessels();
+document.getElementById('mode-status').textContent = 'يدوي';
+document.getElementById('mode-status').style.color = '#FFA500';
+}
+
+saveSettings() {
+const settings = {
+stocks: this.stocks,
+dependent: this.dependent,
+timestamp: new Date().toISOString()
+};
+localStorage.setItem('stellaModelSettings', JSON.stringify(settings));
+alert('✅ تم حفظ التغييرات بنجاح! سيتم تحميلها تلقائياً في المرة القادمة.');
+}
+
+animateVessel(stockName) {
+const idSuffix = this.getSliderIdSuffix(stockName);
+const fill = document.getElementById(`fill-${idSuffix}`);
+const text = document.getElementById(`text-${idSuffix}`);
+
+if (fill && text) {
+const percentage = Math.max(0, Math.min(100, this.stocks[stockName]));
+fill.style.height = percentage + '%';
+text.textContent = this.stocks[stockName].toFixed(1) + '%';
+    
+// تأثير الإضاءة
+const container = fill.parentElement;
+container.classList.add('glow');
+setTimeout(() => container.classList.remove('glow'), 800);
+}
+}
+
+updateAllVessels() {
+Object.keys(this.stocks).forEach(key => this.animateVessel(key));
+}
+
+applyChanges() {
+this.previousValues = {...this.dependent};
+
+// الحسابات الفورية
+this.dependent['القوة الشرائية'] = this.stocks['الطلب السكاني'] * 0.88;
+this.dependent['العرض من الوحدات'] = (this.stocks['الاستثمار الخليجي'] * 0.5) + (this.stocks['وحدات التصالح'] * 1.5);
+
+const gap = (this.dependent['القوة الشرائية'] - this.dependent['العرض من الوحدات']) / 100;
+const blpEffect = 1 - (this.stocks['شفافية BLP'] * 0.003);
+let priceChange = (0.65 * gap) + (0.88 * this.stocks['تكاليف التشييد'] / 100);
+priceChange *= blpEffect;
+this.dependent['أسعار العقارات'] = Math.max(35, 53.8 * (1 + priceChange));
+
+const confidenceChange = this.dependent['أسعار العقارات'] > 53.8 ? 0.4 : -0.3;
+const policyEffect = this.stocks['السياسات الحكومية'] * 0.02;
+this.dependent['ثقة المستهلكين'] = Math.min(96, Math.max(22, 58.9 + confidenceChange + policyEffect));
+
+this.updateDisplay(false);
+this.updateDependentVessels();
+}
+
+updateDependentVessels() {
+Object.keys(this.dependent).forEach(key => {
+const idSuffix = this.dependentKeysMap[key];
+const fill = document.getElementById(`fill-${idSuffix}`);
+const text = document.getElementById(`text-${idSuffix}`);
+
+if (fill && text) {
+const percentage = Math.max(0, Math.min(100, this.dependent[key]));
+fill.style.height = percentage + '%';
+text.textContent = this.dependent[key].toFixed(1) + '%';
+    
+// تأثير الإضاءة
+const container = fill.parentElement;
+container.classList.add('glow');
+setTimeout(() => container.classList.remove('glow'), 800);
+}
+});
+}
+
+updateDisplay(initial = false) {
+// تحديث المؤشرات النهائية
+Object.keys(this.stocks).forEach(key => {
+const idSuffix = this.getSliderIdSuffix(key);
+const text = document.getElementById(`text-${idSuffix}`);
+if (text) text.textContent = this.stocks[key].toFixed(1) + '%';
+});
+
+// النتائج النهائية
+const gap = this.dependent['القوة الشرائية'] - this.dependent['العرض من الوحدات'];
+const gapElement = document.getElementById('result-gap');
+const gapChangeElement = document.getElementById('result-gap-change');
+
+gapElement.textContent = gap.toFixed(1) + '%';
+gapElement.parentElement.className = gap > 0 ? 'result-card positive' : gap < 0 ? 'result-card negative' : 'result-card neutral';
+gapChangeElement.textContent = gap > 0 ? 'طلب أعلى من العرض' : gap < 0 ? 'عرض أعلى من الطلب' : 'متوازن';
+
+const marketElement = document.getElementById('result-market');
+const marketChangeElement = document.getElementById('result-market-change');
+marketElement.textContent = this.dependent['أسعار العقارات'].toFixed(1) + '%';
+const marketChange = this.dependent['أسعار العقارات'] - 53.8;
+marketElement.parentElement.className = marketChange > 0 ? 'result-card positive' : marketChange < 0 ? 'result-card negative' : 'result-card neutral';
+marketChangeElement.textContent = marketChange > 0 ? `↑ صعود ${marketChange.toFixed(1)}%` : marketChange < 0 ? `↓ هبوط ${Math.abs(marketChange).toFixed(1)}%` : '→ مستقر';
+
+const supplyGrowth = ((this.dependent['العرض من الوحدات'] - 42.7) / 42.7 * 100);
+document.getElementById('result-supply-growth').textContent = '+' + supplyGrowth.toFixed(1) + '%';
+
+document.getElementById('result-cost-pressure').textContent = this.stocks['تكاليف التشييد'].toFixed(1) + '%';
+const costChangeElement = document.getElementById('result-cost-change');
+if (this.stocks['تكاليف التشييد'] > 38.5) {
+document.getElementById('result-cost-pressure').parentElement.className = 'result-card negative';
+costChangeElement.textContent = '↑ ضاغط';
+} else {
+document.getElementById('result-cost-pressure').parentElement.className = 'result-card positive';
+costChangeElement.textContent = '↓ متراجع';
+}
+
+document.getElementById('result-confidence-level').textContent = this.dependent['ثقة المستهلكين'].toFixed(1) + '%';
+const confidenceChangeElement = document.getElementById('result-confidence-change');
+if (this.dependent['ثقة المستهلكين'] > 58.9) {
+document.getElementById('result-confidence-level').parentElement.className = 'result-card positive';
+confidenceChangeElement.textContent = 'ممتازة';
+} else if (this.dependent['ثقة المستهلكين'] < 50) {
+document.getElementById('result-confidence-level').parentElement.className = 'result-card negative';
+confidenceChangeElement.textContent = 'ضعيفة';
+} else {
+document.getElementById('result-confidence-level').parentElement.className = 'result-card neutral';
+confidenceChangeElement.textContent = 'جيدة';
+}
+
+const forecast = this.dependent['أسعار العقارات'] * (1 + supplyGrowth / 1000);
+document.getElementById('result-forecast').textContent = forecast.toFixed(1) + '%';
+document.getElementById('result-forecast-change').textContent = forecast > this.dependent['أسعار العقارات'] ? '↑ نمو' : '↓ تراجع';
+
+const marketSize = 25.8 + (this.dependent['أسعار العقارات'] / 53.8) * 5;
+document.getElementById('market-size').textContent = `$${marketSize.toFixed(1)}B`;
+
+// إضافة تألق للمؤشرات النهائية عند التغيير
+document.querySelectorAll('.result-card').forEach(card => {
+card.classList.add('glow');
+setTimeout(() => card.classList.remove('glow'), 800);
+});
+}
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+const model = new StellaFinalModel();
+});
+</script>
+</body>
+</html>
